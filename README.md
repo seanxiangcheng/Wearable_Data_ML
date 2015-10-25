@@ -30,7 +30,7 @@ The general steps are:
 4. Evaluate the model using the testing set
 5. Finally test the model using the separate test set
 
-###Step 1. Data preprocessing
+####Step 1. Data preprocessing
 Keep only variables with at least 90% non-NA data points. Also, because we need to finally test the model with the separate test set **_pml-testing.csv_**, we need to make sure all the variables we used in the training are available in the test set.
 ```{r, eval=FALSE}
 trainingRaw = read.csv("pml-training.csv")
@@ -64,7 +64,7 @@ training = trainData[inTrain, ]
 testing = trainData[-inTrain, ]
 ```
 
-###Step 3. Train the Models
+####Step 3. Train the Models
 Train the models using 5 methods with 5-fold cross validation:
 
 1. SVM
@@ -72,6 +72,9 @@ Train the models using 5 methods with 5-fold cross validation:
 3. gradiant Stochastic Gradient Boosting
 4. Navie Bayes
 5. LDA
+
+Those model are based different assumptions, such as linear relation, independences, etc, and could give us a wide range of insights of how the actual model may be. 
+
 ```{r, eval=FALSE}
 ctrl = trainControl(method="cv", number=5)
 models = c("svmLinear", "rf", "gbm", "nb", "lda") 
@@ -93,7 +96,7 @@ modLDA = train(classe ~ ., data=training, method=models[5], trControl=ctrl)
 
 ```
 
-###Step 4. Evaluate the model using the testing set
+####Step 4. Evaluate the model using the testing set
 As we expected, the out of sample error using the testing set should be larger than that from the cross-validation. However, the out of sample error calculated below is more reliable to evaluate the models.
 
 ```{r, eval=FALSE}
@@ -162,7 +165,7 @@ Detection Rate         0.2843   0.1932   0.1741   0.1629   0.1830
 Detection Prevalence   0.2845   0.1936   0.1751   0.1637   0.1832
 Balanced Accuracy      0.9997   0.9991   0.9987   0.9964   0.9978
 ```
-5. Finally test the model using the separate test set
+####Step 5. Finally test the model using the separate test set
 The predictions is stored in a list.
 ```{r, eval=FALSE}
 finalTestPred = list()
@@ -178,3 +181,8 @@ For convenience of output and results comparison, we convert the list to a data 
 finalTestPredDF = as.data.frame(finalTestPred)
 write.table(finalTestPredDF, file="finalTestPred.csv", sep=",", row.names=FALSE)
 ```
+
+##Summary
+The exercise manner is predicted using 5 different machine learning algorithms. Of those 5 methods, the prediction performance is evaluated from the training set, testing set, and final test set. As we expected, the out of sample accuracy is slight worse than the error from the cross validation. Random forest is best method, and naive bayes and SVM perform the worst. Mostly, it may be because the actual model is not linear, and the predictors are not strictly independent to each other. 
+
+In short, we may pick random forest as our final model. 
